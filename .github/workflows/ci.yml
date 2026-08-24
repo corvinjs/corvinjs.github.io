@@ -47,17 +47,17 @@ jobs:
 
       - name: Assemble _site
         run: |
-          mkdir -p _site
-          cp -r _site_root/. _site/
+          mkdir -p _site_full/
+          cp -r _site/. _site_full/
           SUBMODULES=$(git config --file .gitmodules --get-regexp 'submodule\..*\.path' | awk '{print $2}')
           for dir in $SUBMODULES; do
             [ -d "$dir/_site" ] || { echo "WARN: $dir/_site missing"; continue; }
             mkdir -p "_site/$dir"
-            cp -r "$dir/_site/." "_site/$dir/"
+            cp -r "$dir/_site/." "_site_full/$dir/"
           done
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./_site
+          publish_dir: ./_site_full/
