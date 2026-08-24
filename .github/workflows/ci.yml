@@ -26,13 +26,31 @@ jobs:
           submodules: recursive
           fetch-depth: 2
 
+      - name: Discover submodules
+        id: submodules
+        run: |
+          paths=""
+          key="$(git hash-object .gitmodules)"
+          while IFS= read -r dir; do
+            [ -n "$dir" ] || continue
+            sha=$(git rev-parse "HEAD:$dir" 2>/dev/null || echo "missing")
+            key="${key}:${dir}=${sha}"
+            [ -f "$dir/build.sh" ] || continue
+            paths="${paths}${dir}/_site"$'\n'
+          done < <(git config --file .gitmodules --get-regexp 'submodule\..*\.path' | awk '{print $2}')
+          {
+            echo "paths<<EOF"
+            printf '%s' "$paths"
+            echo "EOF"
+            echo "key=$(printf '%s' "$key" | sha256sum | cut -d' ' -f1)"
+          } >> "$GITHUB_OUTPUT"
+
       - name: Cache submodule build outputs
+        if: steps.submodules.outputs.paths != ''
         uses: actions/cache@v4
         with:
-          path: |
-            blog/**/_site
-            projects/**/_site
-          key: submodule-builds-${{ hashFiles('.gitmodules', 'blog/*/.git', 'projects/*/.git') }}
+          path: ${{ steps.submodules.outputs.paths }}
+          key: submodule-builds-${{ steps.submodules.outputs.key }}
           restore-keys: submodule-builds-
 
       - name: Build root site
@@ -40,8 +58,8 @@ jobs:
 
       - name: Build changed submodules
         run: |
-          SUBMODULES=$(git config --file .gitmodules --get-regexp 'submodule\..*\.path' | awk '{print $2}')
-          for dir in $SUBMODULES; do
+          while IFS= read -r dir; do
+            [ -n "$dir" ] || continue
             [ -d "$dir" ] || continue
             [ -f "$dir/build.sh" ] || { echo "WARN: $dir/build.sh missing"; continue; }
             prev=$(git diff HEAD~1 HEAD -- "$dir" | grep '^-Subproject commit' | awk '{print $3}')
@@ -52,18 +70,18 @@ jobs:
             fi
             echo "Building $dir with baseurl=/$dir"
             (cd "$dir" && bash build.sh "/$dir")
-          done
+          done < <(git config --file .gitmodules --get-regexp 'submodule\..*\.path' | awk '{print $2}')
 
       - name: Assemble _site
         run: |
           mkdir -p _site_full/
           cp -r _site/. _site_full/
-          SUBMODULES=$(git config --file .gitmodules --get-regexp 'submodule\..*\.path' | awk '{print $2}')
-          for dir in $SUBMODULES; do
+          while IFS= read -r dir; do
+            [ -n "$dir" ] || continue
             [ -d "$dir/_site" ] || { echo "WARN: $dir/_site missing"; continue; }
             mkdir -p "_site_full/$dir"
             cp -r "$dir/_site/." "_site_full/$dir/"
-          done
+          done < <(git config --file .gitmodules --get-regexp 'submodule\..*\.path' | awk '{print $2}')
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
