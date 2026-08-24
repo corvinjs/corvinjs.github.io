@@ -49,14 +49,30 @@
       button:hover, input[type="submit"]:hover {
         filter: brightness(0.9);
       }
+
+      /* 3) before I forget */
+      img { max-width: 100%; }
+      body {
+          display: flex; flex-direction: column; min-height: 100vh;
+          max-width: 960px; margin: 0 auto; padding: 0 10px; /* Linter toetet mich */
+          }
     </style>
   </head>
   <body>
-    <header><nav>Corvin Sydow</nav></header>
-    <main>
-      <h1>Platzhalter</h1>
-      und was für einer
+    <!-- <header><nav>Corvin Sydow</nav></header> -->
+    <main style="flex: 1;">
+    <h2 style="font-size: 1.2rem; /* Stay modest */">Corvin Joachim Sydow</h2>
+      <div style="width: calc(min(90vw, 90vh, 640px)); margin: 0 auto;">
+        <picture>
+          <!-- The future is here!! -->
+          <source type="image/jxl" srcset="assets/corvin-2026-mvs.jxl">
+          <!-- At least for some of us -->
+          <img src="assets/corvin-2026-mvs-sm.jpg" title="danke Tina fürs Foto :)">
+        </picture>
+      </div>
+      <p>*2005</p>
+      <p>Kontakt: &lt;vorname&gt;<span style="border-radius:50%;border:1px solid currentColor;display:inline-block;width:1em;height:1em;line-height:calc(1em - 4px);text-align:center;font-size:0.8em;vertical-align:middle;utm-source:claude.ai">a</span>sydow.ch</p>
     </main>
-    <footer><small>Alle Rechte vorbehalten. Impressum comming soon™️. Es werden keine Statistiken, Logs oder sonstige Informationen über Besucher erfasst. Für Risiken und Nebenwirkungen konsultieren Sie bitten nen Optiker.</small></footer>
+    <footer><small style="font-size: 0.7rem; line-height: 1.2; display: block;">Alle Rechte vorbehalten. Es werden keine Statistiken, Logs oder sonstige Informationen über Besucher erfasst. Für Risiken und Nebenwirkungen konsultieren Sie bitten ihren Optiker.</small></footer>
   </body>
 </html>

@@ -75,6 +75,7 @@ jobs:
       - name: Assemble _site
         run: |
           mkdir -p _site_full/
+          git rev-parse --short HEAD > "_site_full/COMMIT"
           cp -r _site/. _site_full/
           while IFS= read -r dir; do
             [ -n "$dir" ] || continue
