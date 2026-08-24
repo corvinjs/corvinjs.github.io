@@ -1,0 +1,63 @@
+name: Build & Deploy
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 2
+
+      - name: Cache submodule build outputs
+        uses: actions/cache@v4
+        with:
+          path: |
+            blog/**/_site
+            projects/**/_site
+          key: submodule-builds-${{ hashFiles('.gitmodules', 'blog/*/.git', 'projects/*/.git') }}
+          restore-keys: submodule-builds-
+
+      - name: Build root site
+        run: bash build.sh /
+
+      - name: Build changed submodules
+        run: |
+          SUBMODULES=$(git config --file .gitmodules --get-regexp 'submodule\..*\.path' | awk '{print $2}')
+          for dir in $SUBMODULES; do
+            [ -d "$dir" ] || continue
+            [ -f "$dir/build.sh" ] || { echo "WARN: $dir/build.sh missing"; continue; }
+
+            prev=$(git diff HEAD~1 HEAD -- "$dir" | grep '^-Subproject commit' | awk '{print $3}')
+            curr=$(git diff HEAD~1 HEAD -- "$dir" | grep '^+Subproject commit' | awk '{print $3}')
+
+            if [ -n "$prev" ] && [ "$prev" = "$curr" ]; then
+              echo "Skipping $dir (unchanged)"
+              continue
+            fi
+
+            echo "Building $dir with baseurl=/$dir"
+            bash "$dir/build.sh" "/$dir"
+          done
+
+      - name: Assemble _site
+        run: |
+          mkdir -p _site
+          cp -r _site_root/. _site/
+          SUBMODULES=$(git config --file .gitmodules --get-regexp 'submodule\..*\.path' | awk '{print $2}')
+          for dir in $SUBMODULES; do
+            [ -d "$dir/_site" ] || { echo "WARN: $dir/_site missing"; continue; }
+            mkdir -p "_site/$dir"
+            cp -r "$dir/_site/." "_site/$dir/"
+          done
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./_site
