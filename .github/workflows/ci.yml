@@ -32,17 +32,14 @@ jobs:
           for dir in $SUBMODULES; do
             [ -d "$dir" ] || continue
             [ -f "$dir/build.sh" ] || { echo "WARN: $dir/build.sh missing"; continue; }
-
             prev=$(git diff HEAD~1 HEAD -- "$dir" | grep '^-Subproject commit' | awk '{print $3}')
             curr=$(git diff HEAD~1 HEAD -- "$dir" | grep '^+Subproject commit' | awk '{print $3}')
-
             if [ -n "$prev" ] && [ "$prev" = "$curr" ]; then
               echo "Skipping $dir (unchanged)"
               continue
             fi
-
             echo "Building $dir with baseurl=/$dir"
-            bash "$dir/build.sh" "/$dir"
+            (cd "$dir" && bash build.sh "/$dir")
           done
 
       - name: Assemble _site
