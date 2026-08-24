@@ -3,6 +3,53 @@
   <head>
     <meta charset="utf-8">
     <title>Corvin Sydow</title>
+    <link rel="preload" href="/fonts/lmsans10-regular.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="/fonts/lmsans10-bold.woff2" as="font" type="font/woff2" crossorigin>
+    <style>
+      /* 1) Font */
+      /* Regular (Weight: 400) */
+      @font-face {
+        font-family: 'LM Sans';
+        font-style: normal;
+        font-weight: 400;
+        font-display: swap;
+        src: url('fonts/lmsans10-regular.woff2') format('woff2');
+      }
+
+      /* Bold (Weight: 700) */
+      @font-face {
+        font-family: 'LM Sans';
+        font-style: normal;
+        font-weight: 700;
+        font-display: swap;
+        src: url('fonts/lmsans10-bold.woff2') format('woff2');
+      }
+
+      body {
+        font-family: 'LM Sans', system-ui, -apple-system, Roboto, Arial, sans-serif;
+      }
+
+      /* 2) Accent color */
+      :root {
+        accent-color: #537c4d;
+        --accent: #537c4d;
+      }
+
+      ::selection { background: var(--accent); color: #fff; }
+      a { color: var(--accent); }
+      :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+      button, input[type="submit"] {
+        background: var(--accent);
+        color: #fff;
+        border: 0;
+        padding: 0.5rem 1rem;
+        border-radius: 0; /* already enough AI slop on this domain */
+        cursor: pointer;
+      }
+      button:hover, input[type="submit"]:hover {
+        filter: brightness(0.9);
+      }
+    </style>
   </head>
   <body>
     <header><nav>Corvin Sydow</nav></header>
