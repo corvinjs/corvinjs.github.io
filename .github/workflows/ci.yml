@@ -49,7 +49,7 @@ jobs:
           SUBMODULES=$(git config --file .gitmodules --get-regexp 'submodule\..*\.path' | awk '{print $2}')
           for dir in $SUBMODULES; do
             [ -d "$dir/_site" ] || { echo "WARN: $dir/_site missing"; continue; }
-            mkdir -p "_site/$dir"
+            mkdir -p "_site_full/$dir"
             cp -r "$dir/_site/." "_site_full/$dir/"
           done
 
