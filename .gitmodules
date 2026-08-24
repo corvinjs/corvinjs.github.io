@@ -1,6 +1,3 @@
-[submodule "blog/rhone2024"]
-	path = blog/rhone2024
-	url = git@github.com:corvinjs/rhone2024
 [submodule "rhone2024"]
 	path = rhone2024
 	url = git@github.com:corvinjs/rhone2024
