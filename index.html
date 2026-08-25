@@ -52,21 +52,28 @@
         filter: brightness(0.9);
       }
 
-      /* 3) before I forget */
-      img { max-width: 100%; }
-      a:not(:hover) { text-decoration: none; }
+      /* 3) Layout */
       hr { opacity: 0.3; }
       body {
-          display: flex; flex-direction: column; min-height: 100vh;
+          display: flex; flex-direction: column; min-height: 99vh;
           max-width: 960px; margin: 0 auto; padding: 0 10px; /* Linter toetet mich */
           }
+      main { flex: 1 }
+
+      /* 4) before I forget */
+      img { width: 100%; }
+      a:not(:hover) { text-decoration: none; }
+      .full-name { font-size: 1.25rem; /* bescheiden bleiben */ }
+      .portrait { width: calc(min(90vw, 90vh, 640px)); margin: 0 auto; }
+      .keinehaftung { font-size: 0.7rem; line-height: 1.2; display: block; }
+
     </style>
   </head>
   <body>
     <!-- <header><nav>Corvin Sydow</nav></header> -->
-    <main style="flex: 1;">
-    <h2 style="font-size: 1.2rem; /* Stay modest */">Corvin Joachim Sydow</h2>
-      <div style="width: calc(min(90vw, 90vh, 640px)); margin: 0 auto;">
+    <main>
+    <h2 class="full-name">Corvin Joachim Sydow</h2>
+      <div class="portrait">
         <picture>
           <!-- The future is here!! -->
           <source type="image/jxl" srcset="assets/corvin-2026-mvs.jxl">
@@ -83,6 +90,6 @@
       <a href="./paris2026">Paris-Austausch 2026</a><br>
       </p>
     </main>
-    <footer><small style="font-size: 0.7rem; line-height: 1.2; display: block;">Alle Rechte vorbehalten. Es werden keine Statistiken, Logs oder sonstige Informationen über Besucher erfasst. Für Risiken und Nebenwirkungen konsultieren Sie bitten ihren Optiker.</small></footer>
+    <footer><small class="keinehaftung">Alle Rechte vorbehalten. Es werden keine Statistiken, Logs oder sonstige Informationen über Besucher erfasst. Für Risiken und Nebenwirkungen konsultieren Sie bitten ihren Optiker.</small></footer>
   </body>
 </html>
