@@ -37,17 +37,13 @@ jobs:
             key="${key}:${dir}=${sha}"
             [ -f "$dir/build.sh" ] || continue
             paths="${paths}${dir}/_site"$'\n'
-            # Only call cache-paths if the script declares support. Otherwise
-            # build.sh treats the arg as BASE_URL and a full build's stdout
-            # (gem install lines, etc.) pollutes the cache path list — which
-            # then fails save with ENAMETOOLONG and leaves no cache to restore.
-            if grep -q 'cache-paths' "$dir/build.sh"; then
-              while IFS= read -r cache_path; do
+            # Optional cache-paths file: one relative path per line.
+            if [ -f "$dir/cache-paths" ]; then
+              while IFS= read -r cache_path || [ -n "$cache_path" ]; do
                 [ -n "$cache_path" ] || continue
-                # Accept simple relative paths only (reject log noise).
                 [[ "$cache_path" =~ ^[A-Za-z0-9._/-]+$ ]] || continue
                 paths="${paths}${dir}/${cache_path}"$'\n'
-              done < <(bash "$dir/build.sh" cache-paths 2>/dev/null || true)
+              done < "$dir/cache-paths"
             fi
           done < <(git config --file .gitmodules --get-regexp 'submodule\..*\.path' | awk '{print $2}')
           echo "Cache paths:"
@@ -59,8 +55,8 @@ jobs:
             echo "key=$(printf '%s' "$key" | sha256sum | cut -d' ' -f1)"
           } >> "$GITHUB_OUTPUT"
 
-      # Submodules may declare extra cache dirs via `build.sh cache-paths`
-      # (e.g. rhone2024's assets/downsized for incremental image conversion).
+      # Submodules may declare extra cache dirs in a `cache-paths` file
+      # (e.g. assets/downsized for incremental image conversion).
       - name: Cache submodule build outputs
         if: steps.submodules.outputs.paths != ''
         uses: actions/cache@v4
