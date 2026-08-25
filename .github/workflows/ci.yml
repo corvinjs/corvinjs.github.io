@@ -45,6 +45,8 @@ jobs:
             echo "key=$(printf '%s' "$key" | sha256sum | cut -d' ' -f1)"
           } >> "$GITHUB_OUTPUT"
 
+      # Restored ${dir}/_site is read by Jekyll keep_files (assets/downsized) in
+      # submodules that generate responsive images during build.
       - name: Cache submodule build outputs
         if: steps.submodules.outputs.paths != ''
         uses: actions/cache@v4

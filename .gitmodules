@@ -4,3 +4,6 @@
 [submodule "paris2026"]
 	path = paris2026
 	url = git@github.com:corvinjs/paris2026
+[submodule "rhone2024jxltest"]
+	path = rhone2024jxltest
+	url = git@github.com:corvinjs/rhone2024jxltest
