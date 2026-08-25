@@ -67,13 +67,13 @@ jobs:
             [ -n "$dir" ] || continue
             [ -d "$dir" ] || continue
             [ -f "$dir/build.sh" ] || { echo "WARN: $dir/build.sh missing"; continue; }
-            prev=$(git diff HEAD~1 HEAD -- "$dir" | grep '^-Subproject commit' | awk '{print $3}')
-            curr=$(git diff HEAD~1 HEAD -- "$dir" | grep '^+Subproject commit' | awk '{print $3}')
-            if [ -n "$prev" ] && [ "$prev" = "$curr" ]; then
-              echo "Skip $dir (submodule unchanged)"
+            prev_sha=$(git rev-parse "HEAD~1:$dir" 2>/dev/null || true)
+            curr_sha=$(git rev-parse "HEAD:$dir" 2>/dev/null || true)
+            if [ "$prev_sha" = "$curr_sha" ]; then
+              echo "Skip $dir (submodule unchanged at ${curr_sha:0:7})"
               continue
             fi
-            echo "::group::Build $dir"
+            echo "::group::Build $dir (${prev_sha:0:7} -> ${curr_sha:0:7})"
             (cd "$dir" && bash build.sh "/$dir")
             echo "::endgroup::"
           done < <(git config --file .gitmodules --get-regexp 'submodule\..*\.path' | awk '{print $2}')
