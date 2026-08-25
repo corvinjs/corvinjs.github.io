@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 500 500"
+   width="100%"
+   height="100%"
+   version="1.1"
+   id="svg13"
+   sodipodi:docname="favicon.svg"
+   inkscape:version="1.4 (e7c3feb100, 2024-10-09)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview13"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="1.728"
+     inkscape:cx="249.71065"
+     inkscape:cy="250"
+     inkscape:window-width="1920"
+     inkscape:window-height="1128"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg13" />
+  <defs
+     id="defs8">
+    <!-- Neon Glow Filter -->
+    <filter
+       id="neon-glow"
+       x="-0.33278384"
+       y="-0.53744529"
+       width="1.6726663"
+       height="2.0978619">
+      <!-- Drop Shadow Color: #537c4d -->
+      <feFlood
+         flood-color="#537c4d"
+         flood-opacity="1"
+         result="flood"
+         id="feFlood1" />
+      <feComposite
+         in="flood"
+         in2="SourceAlpha"
+         operator="in"
+         result="mask"
+         id="feComposite1" />
+      <!-- Blurs for ambient shadow/glow -->
+      <feGaussianBlur
+         in="mask"
+         stdDeviation="6"
+         result="blur1"
+         id="feGaussianBlur1" />
+      <feGaussianBlur
+         in="mask"
+         stdDeviation="16"
+         result="blur2"
+         id="feGaussianBlur2" />
+      <feGaussianBlur
+         in="mask"
+         stdDeviation="28"
+         result="blur3"
+         id="feGaussianBlur3" />
+      <!-- Merge glows behind the main stroke -->
+      <feMerge
+         result="glow"
+         id="feMerge5">
+        <feMergeNode
+           in="blur3"
+           id="feMergeNode3" />
+        <feMergeNode
+           in="blur2"
+           id="feMergeNode4" />
+        <feMergeNode
+           in="blur1"
+           id="feMergeNode5" />
+      </feMerge>
+      <!-- Outer dark edge for contrast -->
+      <feOffset
+         in="mask"
+         dx="4"
+         dy="6"
+         result="offset-shadow"
+         id="feOffset5" />
+      <feGaussianBlur
+         in="offset-shadow"
+         stdDeviation="4"
+         result="shadow-blur"
+         id="feGaussianBlur5" />
+      <!-- Layering Shadow, Glow, and Original White Tube -->
+      <feMerge
+         id="feMerge8">
+        <feMergeNode
+           in="shadow-blur"
+           id="feMergeNode6" />
+        <feMergeNode
+           in="glow"
+           id="feMergeNode7" />
+        <feMergeNode
+           in="SourceGraphic"
+           id="feMergeNode8" />
+      </feMerge>
+    </filter>
+    <!-- Tube End Cap Styles -->
+    <style
+       id="style8">
+      .neon-text {
+      fill: none;
+      stroke: #ffffff;
+      stroke-width: 22;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      filter: url(#neon-glow);
+      }
+      .neon-core {
+      fill: none;
+      stroke: #ffffff;
+      stroke-width: 30;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      opacity: 0.3;
+      filter: blur(2px);
+      }
+    </style>
+  </defs>
+  <!-- Letter Paths (Neon Tube Geometry - Expanded, Scaled and Re-centered) -->
+  <g
+     class="neon-text"
+     id="g10"
+     transform="translate(0.5787037,-16.782407)">
+    <!-- C -->
+    <path
+       d="M 167.89352,169.67592 C 142.68519,113.88889 76.944445,142.24538 53.472223,194.30556 32.290136,236.55842 33.08236,300.06575 50.578704,348.84259 71.157408,393.37963 132.26852,407.84722 165,370"
+       id="path8"
+       sodipodi:nodetypes="cccc" />
+    <!-- J -->
+    <path
+       d="M 284.4213,142.98611 285,320 c 0.26585,81.31901 -50.11574,95.74074 -83.7963,38.42593"
+       id="path9"
+       sodipodi:nodetypes="csc" />
+    <!-- S -->
+    <path
+       d="m 460.68127,170.43134 c -20.81325,-52.84574 -114.92198,-45.9013 -114.18355,36.2636 10.57641,76.18311 93.92892,20.71941 107.39883,115.32368 -1.57636,77.72448 -75.43046,97.20567 -116.638,47.25344"
+       id="path10"
+       style="stroke-width:20.4568"
+       sodipodi:nodetypes="cccc" />
+  </g>
+  <!-- Inner Core Intensifier for Glass Tube Effect -->
+  <g
+     class="neon-core"
+     id="g13"
+     transform="translate(0.5787037,-16.782407)">
+    <!-- C -->
+    <path
+       d="m 167.89352,170.25463 c -2.60034,-4.85923 -7.31883,-13.02182 -10.60124,-16.44082 -0.11955,-0.12453 -0.23949,-0.24813 -0.35983,-0.37082 -18.41286,-18.77209 -46.05049,-16.09644 -68.723816,-1.47496 -12.552708,8.09494 -23.583798,19.85141 -30.685486,33.65697 -22.106481,45.11574 -25,94.375 -11.574074,148.17129 14.791667,65.94908 94.421296,70 119.050926,37.36111"
+       id="path11"
+       sodipodi:nodetypes="csssccc" />
+    <!-- J -->
+    <path
+       d="M 285,142.98611 V 320 c 0,90 -57.63889,91.68982 -82.63889,36.68982"
+       id="path12"
+       sodipodi:nodetypes="csc" />
+    <!-- S -->
+    <path
+       d="m 461.25997,169.85264 c -17.24868,-40.97853 -96.71799,-56.74582 -114.18354,24.11082 -3.95504,92.68858 84.72598,27.39954 107.39883,127.47646 -2.15507,87.56244 -93.37028,93.15474 -117.21671,47.83214"
+       id="path13"
+       sodipodi:nodetypes="cccc"
+       style="stroke-width:27.8956" />
+  </g>
+</svg>
