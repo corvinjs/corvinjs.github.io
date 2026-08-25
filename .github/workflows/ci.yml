@@ -69,7 +69,6 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ${{ steps.submodules.outputs.paths }}
-          key: submodule-builds-${{ steps.submodules.outputs.key }}
           key: submodule-builds-v2-debug-${{ steps.submodules.outputs.key }}
           restore-keys: |
             submodule-builds-v2-debug-
