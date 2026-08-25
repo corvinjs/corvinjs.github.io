@@ -37,6 +37,7 @@ jobs:
             key="${key}:${dir}=${sha}"
             [ -f "$dir/build.sh" ] || continue
             paths="${paths}${dir}/_site"$'\n'
+            paths="${paths}${dir}/assets/downsized"$'\n'
           done < <(git config --file .gitmodules --get-regexp 'submodule\..*\.path' | awk '{print $2}')
           {
             echo "paths<<EOF"
@@ -45,8 +46,8 @@ jobs:
             echo "key=$(printf '%s' "$key" | sha256sum | cut -d' ' -f1)"
           } >> "$GITHUB_OUTPUT"
 
-      # Restored ${dir}/_site is read by Jekyll keep_files (assets/downsized) in
-      # submodules that generate responsive images during build.
+      # Restored ${dir}/assets/downsized is read by rhone2024's picture plugin;
+      # per-image sha256 in the manifest skips reconversion of unchanged photos.
       - name: Cache submodule build outputs
         if: steps.submodules.outputs.paths != ''
         uses: actions/cache@v4
