@@ -21,7 +21,7 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           submodules: recursive
           fetch-depth: 2
@@ -59,7 +59,7 @@ jobs:
       # (e.g. assets/downsized for incremental image conversion).
       - name: Cache submodule build outputs
         if: steps.submodules.outputs.paths != ''
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ${{ steps.submodules.outputs.paths }}
           key: submodule-builds-${{ steps.submodules.outputs.key }}
