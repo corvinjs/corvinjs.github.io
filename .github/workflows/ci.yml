@@ -56,7 +56,10 @@ jobs:
           restore-keys: submodule-builds-
 
       - name: Build root site
-        run: bash build.sh /
+        run: |
+          echo "::group::Root site"
+          bash build.sh /
+          echo "::endgroup::"
 
       - name: Build changed submodules
         run: |
@@ -67,11 +70,12 @@ jobs:
             prev=$(git diff HEAD~1 HEAD -- "$dir" | grep '^-Subproject commit' | awk '{print $3}')
             curr=$(git diff HEAD~1 HEAD -- "$dir" | grep '^+Subproject commit' | awk '{print $3}')
             if [ -n "$prev" ] && [ "$prev" = "$curr" ]; then
-              echo "Skipping $dir (unchanged)"
+              echo "Skip $dir (submodule unchanged)"
               continue
             fi
-            echo "Building $dir with baseurl=/$dir"
+            echo "::group::Build $dir"
             (cd "$dir" && bash build.sh "/$dir")
+            echo "::endgroup::"
           done < <(git config --file .gitmodules --get-regexp 'submodule\..*\.path' | awk '{print $2}')
 
       - name: Assemble _site
