@@ -37,7 +37,10 @@ jobs:
             key="${key}:${dir}=${sha}"
             [ -f "$dir/build.sh" ] || continue
             paths="${paths}${dir}/_site"$'\n'
-            paths="${paths}${dir}/assets/downsized"$'\n'
+            while IFS= read -r cache_path; do
+              [ -n "$cache_path" ] || continue
+              paths="${paths}${dir}/${cache_path}"$'\n'
+            done < <(bash "$dir/build.sh" cache-paths 2>/dev/null || true)
           done < <(git config --file .gitmodules --get-regexp 'submodule\..*\.path' | awk '{print $2}')
           {
             echo "paths<<EOF"
@@ -46,8 +49,8 @@ jobs:
             echo "key=$(printf '%s' "$key" | sha256sum | cut -d' ' -f1)"
           } >> "$GITHUB_OUTPUT"
 
-      # Restored ${dir}/assets/downsized is read by rhone2024's picture plugin;
-      # per-image sha256 in the manifest skips reconversion of unchanged photos.
+      # Submodules may declare extra cache dirs via `build.sh cache-paths`
+      # (e.g. rhone2024's assets/downsized for incremental image conversion).
       - name: Cache submodule build outputs
         if: steps.submodules.outputs.paths != ''
         uses: actions/cache@v4
