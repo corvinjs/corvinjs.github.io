@@ -27,7 +27,11 @@ SUBMODULE_MSG="\$(git log -1 --pretty=%s)"
 
 cd "'"$PARENT_DIR"'"
 git add "$sm_path"
-(git diff --cached --quiet && echo Warning: Parent did not find changes.) || (git commit -m "\$SUBMODULE_NAME: \$SUBMODULE_MSG" && echo Included changes in parent.)
+if git diff --cached --quiet; then
+  echo "Warning: Parent did not find changes."
+else
+  git commit -m "\$SUBMODULE_NAME: \$SUBMODULE_MSG" && echo "Included changes in parent."
+fi
 git push --quiet && echo Pushed parent to origin.
 HOOKEOF
   chmod +x "$HOOK"
