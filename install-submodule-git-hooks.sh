@@ -15,6 +15,10 @@ git submodule foreach '
   mkdir -p "$HOOKS_DIR"
   cat > "$HOOK" << HOOKEOF
 #!/bin/sh
+
+# So gh actions can find the new commit
+git push --quiet
+
 # Unset Git environment variables set by the host commit process
 unset \$(git rev-parse --local-env-vars)
 
