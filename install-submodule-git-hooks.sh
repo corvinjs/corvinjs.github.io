@@ -17,7 +17,7 @@ git submodule foreach '
 #!/bin/sh
 
 # So gh actions can find the new commit
-git push --quiet
+git push --quiet && echo Pushed changes to origin.
 
 # Unset Git environment variables set by the host commit process
 unset \$(git rev-parse --local-env-vars)
@@ -27,8 +27,8 @@ SUBMODULE_MSG="\$(git log -1 --pretty=%s)"
 
 cd "'"$PARENT_DIR"'"
 git add "$sm_path"
-git diff --cached --quiet || git commit -m "\$SUBMODULE_NAME: \$SUBMODULE_MSG"
-git push --quiet
+(git diff --cached --quiet && echo Warning: Parent did not find changes.) || (git commit -m "\$SUBMODULE_NAME: \$SUBMODULE_MSG" && echo Included changes in parent.)
+git push --quiet && echo Pushed parent to origin.
 HOOKEOF
   chmod +x "$HOOK"
   echo "Installed hook in submodule: $sm_path"
