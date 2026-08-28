@@ -15,13 +15,17 @@ git submodule foreach '
   mkdir -p "$HOOKS_DIR"
   cat > "$HOOK" << HOOKEOF
 #!/bin/sh
-SUBMODULE_NAME="'"$name"'"
+# Unset Git environment variables set by the host commit process
+unset \$(git rev-parse --local-env-vars)
+
+SUBMODULE_NAME="'"$sm_path"'"
 SUBMODULE_MSG="\$(git log -1 --pretty=%s)"
-git --git-dir="'"$PARENT_DIR"'/.git" --work-tree="'"$PARENT_DIR"'" add "'"$PARENT_DIR"'/$SUBMODULE_NAME"
-git --git-dir="'"$PARENT_DIR"'/.git" --work-tree="'"$PARENT_DIR"'" diff --cached --quiet || \
-  git --git-dir="'"$PARENT_DIR"'/.git" --work-tree="'"$PARENT_DIR"'" commit -m "\$SUBMODULE_NAME: \$SUBMODULE_MSG"
-git --git-dir="'"$PARENT_DIR"'/.git" --work-tree="'"$PARENT_DIR"'" push
+
+cd "'"$PARENT_DIR"'"
+git add "$sm_path"
+git diff --cached --quiet || git commit -m "\$SUBMODULE_NAME: \$SUBMODULE_MSG"
+git push --quiet
 HOOKEOF
   chmod +x "$HOOK"
-  echo "Installed hook in submodule: $name"
+  echo "Installed hook in submodule: $sm_path"
 '
