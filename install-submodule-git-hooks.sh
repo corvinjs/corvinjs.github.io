@@ -22,7 +22,7 @@ git push --quiet
 # Unset Git environment variables set by the host commit process
 unset \$(git rev-parse --local-env-vars)
 
-SUBMODULE_NAME="'"$sm_path"'"
+SUBMODULE_NAME="$sm_path"
 SUBMODULE_MSG="\$(git log -1 --pretty=%s)"
 
 cd "'"$PARENT_DIR"'"
