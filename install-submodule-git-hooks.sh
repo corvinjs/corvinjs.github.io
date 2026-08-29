@@ -17,7 +17,7 @@ git submodule foreach '
 #!/bin/sh
 
 # So gh actions can find the new commit
-git push --quiet && echo Pushed changes to origin.
+(git push --quiet && echo Pushed changes to origin.) &
 
 # Unset Git environment variables set by the host commit process
 unset \$(git rev-parse --local-env-vars)
