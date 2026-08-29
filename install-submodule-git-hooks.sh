@@ -1,39 +1,36 @@
 #!/bin/sh
-# Run this here.
-# Installs a post-commit hook in each submodule that auto-commits
-# the updated submodule ref in the parent and pushes.
+# Install a post-commit hook in each submodule
+# so the parent directly includes changes and pushes both.
 
 set -e
 
 PARENT_DIR="$(pwd)"
 
 git submodule foreach '
-  GIT_DIR="$(git rev-parse --git-dir)"
-  HOOKS_DIR="$GIT_DIR/hooks"
-  HOOK="$HOOKS_DIR/post-commit"
+  HOOKS_DIR="$(git rev-parse --git-path hooks)"
 
   mkdir -p "$HOOKS_DIR"
-  cat > "$HOOK" << HOOKEOF
+  cat > "$HOOKS_DIR/post-commit" << HOOKEOF
 #!/bin/sh
 
-# So gh actions can find the new commit
-(git push --quiet && echo Pushed changes to origin.) &
+SUBMODULE_COMMIT_MSG="\$(git log -1 --pretty=%s)"
 
-# Unset Git environment variables set by the host commit process
+(git push --quiet && echo "Pushed $sm_path to origin.") &
+
+# Unset Git environment variables that force git to target the submodule
 unset \$(git rev-parse --local-env-vars)
-
-SUBMODULE_NAME="$sm_path"
-SUBMODULE_MSG="\$(git log -1 --pretty=%s)"
-
 cd "'"$PARENT_DIR"'"
+
 git add "$sm_path"
-if git diff --cached --quiet; then
-  echo "Warning: Parent did not find changes."
+if git diff --cached --quiet -- "$sm_path"; then
+  echo "Warning: Parent did not find changes for $sm_path."
 else
-  git commit -m "\$SUBMODULE_NAME: \$SUBMODULE_MSG" && echo "Included changes in parent."
+  git commit --quiet -m "$sm_path: \$SUBMODULE_COMMIT_MSG" -- "$sm_path"
+  (git push --quiet && echo "Pushed parent to origin.") &
 fi
-git push --quiet && echo Pushed parent to origin.
+
+wait
 HOOKEOF
-  chmod +x "$HOOK"
+  chmod +x "$HOOKS_DIR/post-commit"
   echo "Installed hook in submodule: $sm_path"
 '
