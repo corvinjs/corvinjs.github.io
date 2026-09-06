@@ -79,9 +79,12 @@ jobs:
             [ -f "$dir/build.sh" ] || { echo "WARN: $dir/build.sh missing"; continue; }
             prev_sha=$(git rev-parse "HEAD~1:$dir" 2>/dev/null || true)
             curr_sha=$(git rev-parse "HEAD:$dir" 2>/dev/null || true)
-            if [ "$prev_sha" = "$curr_sha" ]; then
-              echo "Skip $dir (submodule unchanged at ${curr_sha:0:7})"
+            if [ "$prev_sha" = "$curr_sha" ] && [ -d "$dir/_site" ]; then
+              echo "Skip $dir (submodule unchanged at ${curr_sha:0:7}, build output present)"
               continue
+            fi
+            if [ "$prev_sha" = "$curr_sha" ]; then
+              echo "Rebuild $dir (submodule unchanged, build output missing)"
             fi
             echo "::group::Build $dir (${prev_sha:0:7} -> ${curr_sha:0:7})"
             (cd "$dir" && bash build.sh "/$dir")
