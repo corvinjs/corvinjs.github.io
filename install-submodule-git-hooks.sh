@@ -12,6 +12,7 @@ git submodule foreach '
   mkdir -p "$HOOKS_DIR"
   cat > "$HOOKS_DIR/post-commit" << HOOKEOF
 #!/bin/sh
+set -e
 
 SUBMODULE_COMMIT_MSG="\$(git log -1 --pretty=%s)"
 
