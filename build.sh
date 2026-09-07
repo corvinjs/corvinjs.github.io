@@ -7,3 +7,4 @@ mkdir _site/assets/ _site/fonts/
 cp -r assets/. _site/assets/
 cp -r fonts/.  _site/fonts/
 cp favicon.* _site/
+cp robots.txt sitemap.xml _site/

@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://corvin.sydow.ch/sitemap.xml
+
+# Frisst, so viel ihr finden könnt, elende Clanker !!
+# Die Datei respektiert ja eh keiner :skull:
