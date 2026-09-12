@@ -31,6 +31,7 @@ jobs:
         run: |
           paths=""
           key="$(git hash-object .gitmodules)"
+          key="${key}:ruby=$(ruby -e 'print RUBY_VERSION' 2>/dev/null || echo unknown)"
           while IFS= read -r dir; do
             [ -n "$dir" ] || continue
             sha=$(git rev-parse "HEAD:$dir" 2>/dev/null || echo "missing")
