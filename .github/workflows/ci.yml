@@ -6,6 +6,7 @@ on:
 
 permissions:
   contents: read
+  actions: write
   pages: write
   id-token: write
 
@@ -60,7 +61,8 @@ jobs:
       # (e.g. assets/downsized for incremental image conversion).
       - name: Cache submodule build outputs
         if: steps.submodules.outputs.paths != ''
-        uses: actions/cache@v6
+        id: cache-restore
+        uses: actions/cache/restore@v6
         with:
           path: ${{ steps.submodules.outputs.paths }}
           key: submodule-builds-${{ steps.submodules.outputs.key }}
@@ -103,6 +105,24 @@ jobs:
             mkdir -p "_site_full/$dir"
             cp -r "$dir/_site/." "_site_full/$dir/"
           done < <(git config --file .gitmodules --get-regexp 'submodule\..*\.path' | awk '{print $2}')
+
+      - name: Upload submodule build cache
+        if: steps.submodules.outputs.paths != ''
+        id: cache-save
+        uses: actions/cache/save@v6
+        with:
+          path: ${{ steps.submodules.outputs.paths }}
+          key: submodule-builds-${{ steps.submodules.outputs.key }}
+
+      - name: Delete previous submodule build cache
+        if: >-
+          steps.cache-save.outcome == 'success' &&
+          steps.cache-restore.outputs.cache-matched-key != '' &&
+          steps.cache-restore.outputs.cache-matched-key !=
+          format('submodule-builds-{0}', steps.submodules.outputs.key)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh cache delete "${{ steps.cache-restore.outputs.cache-matched-key }}" --confirm
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v5
