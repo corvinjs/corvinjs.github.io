@@ -1,3 +1,5 @@
 _site_full/
 _site/
 *.kate-swp
+
+home/build-stealth.py
