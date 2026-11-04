@@ -1,9 +1,9 @@
 [submodule "rhone2024"]
 	path = rhone2024
-	url = git@github.com:corvinjs/rhone2024
+	url = https://github.com/corvinjs/rhone2024
 [submodule "paris2026"]
 	path = paris2026
-	url = git@github.com:corvinjs/paris2026
+	url = https://github.com/corvinjs/paris2026
 [submodule "m1-room-changes"]
 	path = m1-room-changes
-	url = git@github.com:corvinjs/m1-room-changes
+	url = https://github.com/corvinjs/m1-room-changes
