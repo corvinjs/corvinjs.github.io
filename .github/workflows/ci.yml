@@ -109,7 +109,7 @@ jobs:
       - name: Upload submodule build cache
         if: steps.submodules.outputs.paths != ''
         id: cache-save
-        uses: actions/cache/save@v6.1
+        uses: actions/cache/save@v6
         with:
           path: ${{ steps.submodules.outputs.paths }}
           key: submodule-builds-${{ steps.submodules.outputs.key }}
