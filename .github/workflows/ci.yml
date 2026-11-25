@@ -15,12 +15,8 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-
     steps:
       # Submodules are fetched by build.sh, only for the sites it rebuilds.
       - uses: actions/checkout@v7.0.1
@@ -51,5 +47,14 @@ jobs:
         with:
           path: _site
 
+  # A separate job: deploy-pages right after the upload in the same job
+  # intermittently fails to find the artifact ("Found 0 artifact(s)").
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
       - id: deployment
         uses: actions/deploy-pages@v5.0.1
