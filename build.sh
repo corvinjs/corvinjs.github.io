@@ -32,6 +32,7 @@ for dir in "${!mount[@]}"; do
   if [ -f "$dir/build.sh" ]; then
     pkgs=$(sed -n 's/^# apt: //p' "$dir/build.sh")
     if [ -n "${CI:-}" ] && [ -n "$pkgs" ]; then
+      sudo rm -f /var/lib/man-db/auto-update # skip the slow man-db trigger
       # shellcheck disable=SC2086
       sudo apt-get update -qq && sudo apt-get install -yqq --no-install-recommends $pkgs
     fi
