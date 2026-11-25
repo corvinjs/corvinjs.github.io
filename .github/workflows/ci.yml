@@ -6,7 +6,7 @@ on:
 
 permissions:
   contents: read
-  actions: write
+  actions: write # delete superseded caches
   pages: write
   id-token: write
 
@@ -15,120 +15,41 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
+      # Submodules are fetched by build.sh, only for the sites it rebuilds.
       - uses: actions/checkout@v7.0.1
+
+      # _site holds every site's last output; build.sh skips the unchanged ones.
+      - uses: actions/cache/restore@v6
         with:
-          submodules: recursive
-          fetch-depth: 2
+          path: _site
+          key: site-${{ github.sha }}
+          restore-keys: site-
 
-      - name: Discover submodules
-        id: submodules
-        run: |
-          paths=""
-          key="$(git hash-object .gitmodules)"
-          key="${key}:ruby=$(ruby -e 'print RUBY_VERSION' 2>/dev/null || echo unknown)"
-          while IFS= read -r dir; do
-            [ -n "$dir" ] || continue
-            sha=$(git rev-parse "HEAD:$dir" 2>/dev/null || echo "missing")
-            key="${key}:${dir}=${sha}"
-            [ -f "$dir/build.sh" ] || continue
-            paths="${paths}${dir}/_site"$'\n'
-            # Optional cache-paths file: one relative path per line.
-            if [ -f "$dir/cache-paths" ]; then
-              while IFS= read -r cache_path || [ -n "$cache_path" ]; do
-                [ -n "$cache_path" ] || continue
-                [[ "$cache_path" =~ ^[A-Za-z0-9._/-]+$ ]] || continue
-                paths="${paths}${dir}/${cache_path}"$'\n'
-              done < "$dir/cache-paths"
-            fi
-          done < <(git config --file .gitmodules --get-regexp 'submodule\..*\.path' | awk '{print $2}')
-          echo "Cache paths:"
-          printf '%s\n' "$paths"
-          {
-            echo "paths<<EOF"
-            printf '%s' "$paths"
-            echo "EOF"
-            echo "key=$(printf '%s' "$key" | sha256sum | cut -d' ' -f1)"
-          } >> "$GITHUB_OUTPUT"
+      - run: bash build.sh
 
-      # Submodules may declare extra cache dirs in a `cache-paths` file
-      # (e.g. assets/downsized for incremental image conversion).
-      - name: Cache submodule build outputs
-        if: steps.submodules.outputs.paths != ''
-        id: cache-restore
-        uses: actions/cache/restore@v6
+      - uses: actions/cache/save@v6
         with:
-          path: ${{ steps.submodules.outputs.paths }}
-          key: submodule-builds-${{ steps.submodules.outputs.key }}
-          restore-keys: submodule-builds-
+          path: _site
+          key: site-${{ github.sha }}
 
-      - name: Build root site
-        run: |
-          echo "::group::Root site"
-          bash build.sh /
-          echo "::endgroup::"
-
-      - name: Build changed submodules
-        run: |
-          while IFS= read -r dir; do
-            [ -n "$dir" ] || continue
-            [ -d "$dir" ] || continue
-            [ -f "$dir/build.sh" ] || { echo "WARN: $dir/build.sh missing"; continue; }
-            prev_sha=$(git rev-parse "HEAD~1:$dir" 2>/dev/null || true)
-            curr_sha=$(git rev-parse "HEAD:$dir" 2>/dev/null || true)
-            if [ "$prev_sha" = "$curr_sha" ] && [ -d "$dir/_site" ]; then
-              echo "Skip $dir (submodule unchanged at ${curr_sha:0:7}, build output present)"
-              continue
-            fi
-            if [ "$prev_sha" = "$curr_sha" ]; then
-              echo "Rebuild $dir (submodule unchanged, build output missing)"
-            fi
-            echo "::group::Build $dir (${prev_sha:0:7} -> ${curr_sha:0:7})"
-            (cd "$dir" && bash build.sh "/$dir")
-            echo "::endgroup::"
-          done < <(git config --file .gitmodules --get-regexp 'submodule\..*\.path' | awk '{print $2}')
-
-      - name: Assemble _site
-        run: |
-          mkdir -p _site_full/
-          git rev-parse --short HEAD > "_site_full/COMMIT"
-          cp -r _site/. _site_full/
-          while IFS= read -r dir; do
-            [ -n "$dir" ] || continue
-            [ -d "$dir/_site" ] || { echo "WARN: $dir/_site missing"; continue; }
-            mkdir -p "_site_full/$dir"
-            cp -r "$dir/_site/." "_site_full/$dir/"
-          done < <(git config --file .gitmodules --get-regexp 'submodule\..*\.path' | awk '{print $2}')
-
-      - name: Upload submodule build cache
-        if: steps.submodules.outputs.paths != ''
-        id: cache-save
-        uses: actions/cache/save@v6
-        with:
-          path: ${{ steps.submodules.outputs.paths }}
-          key: submodule-builds-${{ steps.submodules.outputs.key }}
-
-      - name: Delete previous submodule build cache
-        if: >-
-          steps.cache-save.outcome == 'success' &&
-          steps.cache-restore.outputs.cache-matched-key != '' &&
-          steps.cache-restore.outputs.cache-matched-key !=
-          format('submodule-builds-{0}', steps.submodules.outputs.key)
+      - name: Delete superseded caches
         env:
           GH_TOKEN: ${{ github.token }}
-        run: echo yes | gh cache delete "${{ steps.cache-restore.outputs.cache-matched-key }}"
+        run: |
+          gh cache list --key site- --json key --jq '.[].key' |
+            grep -vx "site-${{ github.sha }}" |
+            while read -r key; do gh cache delete "$key"; done
 
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v5
+      - uses: actions/upload-pages-artifact@v5
         with:
-          path: _site_full
+          path: _site
 
-      - name: Deploy to GitHub Pages
-        id: deployment
+      - id: deployment
         uses: actions/deploy-pages@v5.0.1
